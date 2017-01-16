@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/utgwkk/wave-visualizer/issues"
   },
-  "homepage": "https://github.com/utgwkk/wave-visualizer#readme"
+  "homepage": "https://github.com/utgwkk/wave-visualizer#readme",
+  "devDependencies": {
+    "browserify": "^13.3.0",
+    "gulp": "^3.9.1",
+    "vinyl-source-stream": "^1.1.0"
+  }
 }
