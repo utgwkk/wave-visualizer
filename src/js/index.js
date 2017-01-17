@@ -1,10 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+  const pauseButton = document.getElementById('pause-button')
+  const muteButton = document.getElementById('mute-button')
+  const volumeRange = document.getElementById('volume')
   const canvas = document.getElementById('visualizer')
   const canvasCtx = canvas.getContext('2d')
   const analyser = audioCtx.createAnalyser()
+  const gainNode = audioCtx.createGain()
   let drawVisual // requestAnimationFrame
   let source = null
+  let oldGainValue = 1
+
+  volumeRange.addEventListener('change', (evt) => {
+    gainNode.gain.value = evt.target.value
+  })
+
+  pauseButton.addEventListener('click', (evt) => {
+    if (audioCtx.state === 'running') {
+      audioCtx.suspend().then(() => {
+        pauseButton.textContent = '再開'
+      })
+    } else {
+      audioCtx.resume().then(() => {
+        pauseButton.textContent = '一時停止'
+      })
+    }
+  }, false)
+
+  muteButton.addEventListener('click', (evt) => {
+    if (volumeRange.disabled) {
+      gainNode.gain.value = oldGainValue
+      muteButton.textContent = 'ミュート'
+    } else {
+      oldGainValue = gainNode.gain.value
+      gainNode.gain.value = 0
+      muteButton.textContent = 'ミュート解除'
+    }
+    volumeRange.disabled = !volumeRange.disabled
+  }, false)
 
   document.getElementById('file').addEventListener('change', (evt) => {
     if (source !== null)
@@ -22,11 +55,17 @@ document.addEventListener('DOMContentLoaded', () => {
           const result = e.target.result
           audioCtx.decodeAudioData(result, (buffer) => {
             source = audioCtx.createBufferSource()
+            source.onended = (evt) => {
+              pauseButton.disabled = true
+            }
+
             source.buffer = buffer
-            source.connect(analyser)
+            source.connect(gainNode)
+            gainNode.connect(analyser)
             analyser.connect(audioCtx.destination)
 
             source.start(0)
+            pauseButton.disabled = false
 
             visualize()
           })
