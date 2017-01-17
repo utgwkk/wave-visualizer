@@ -35,6 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
           const result = e.target.result
           audioCtx.decodeAudioData(result, (buffer) => {
             source = audioCtx.createBufferSource()
+            source.onended = (evt) => {
+              pauseButton.disabled = true
+            }
+
             source.buffer = buffer
             source.connect(analyser)
             analyser.connect(audioCtx.destination)
