@@ -4,9 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const canvasCtx = canvas.getContext('2d')
   const analyser = audioCtx.createAnalyser()
   let drawVisual // requestAnimationFrame
-  let source
+  let source = null
 
   document.getElementById('file').addEventListener('change', (evt) => {
+    if (source !== null)
+      source.stop()
     const files = evt.target.files
 
     for (let i = 0; i < files.length; ++i) {
