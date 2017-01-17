@@ -1,11 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
   const pauseButton = document.getElementById('pause-button')
+  const volumeRange = document.getElementById('volume')
   const canvas = document.getElementById('visualizer')
   const canvasCtx = canvas.getContext('2d')
   const analyser = audioCtx.createAnalyser()
+  const gainNode = audioCtx.createGain()
   let drawVisual // requestAnimationFrame
   let source = null
+
+  volumeRange.addEventListener('change', (evt) => {
+    gainNode.gain.value = evt.target.value
+  })
 
   pauseButton.addEventListener('click', (evt) => {
     if (audioCtx.state === 'running') {
@@ -40,7 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             source.buffer = buffer
-            source.connect(analyser)
+            source.connect(gainNode)
+            gainNode.connect(analyser)
             analyser.connect(audioCtx.destination)
 
             source.start(0)
