@@ -7,6 +7,6 @@ gulp.task('default', () => {
     entries: './src/js/index.js'
   })
   .bundle()
-  .pipe(source('app.js'))
+  .pipe(source('visualizer.js'))
   .pipe(gulp.dest('./static/js'))
 })
