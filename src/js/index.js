@@ -1,10 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+  const pauseButton = document.getElementById('pause-button')
   const canvas = document.getElementById('visualizer')
   const canvasCtx = canvas.getContext('2d')
   const analyser = audioCtx.createAnalyser()
   let drawVisual // requestAnimationFrame
   let source = null
+
+  pauseButton.addEventListener('click', (evt) => {
+    if (audioCtx.state === 'running') {
+      audioCtx.suspend().then(() => {
+        pauseButton.textContent = '再開'
+      })
+    } else {
+      audioCtx.resume().then(() => {
+        pauseButton.textContent = '一時停止'
+      })
+    }
+  }, false)
 
   document.getElementById('file').addEventListener('change', (evt) => {
     if (source !== null)
@@ -27,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
             analyser.connect(audioCtx.destination)
 
             source.start(0)
+            pauseButton.disabled = false
 
             visualize()
           })
